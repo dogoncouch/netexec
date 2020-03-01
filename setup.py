@@ -30,26 +30,27 @@ Options
 
 ::
 
-usage: run.py [-h] [--version] [-u USER] [-p] [-x EXECUTABLE] [-c]
-              [-d DEVICETYPE] [--list-types] -i INPUT [-t TIMEOUT]
-              [-l DEVICELIST]
-              [device]
+usage: netexec [-h] [--version] [-y] [-u USER] [-p] [-c COMMAND] [-x]
+               [-d DEVICETYPE] [--list-types] [-i INPUT] [-t TIMEOUT]
+               [-l DEVICELIST]
+               [device]
 
 positional arguments:
-  device             specify a device to which to connect
+  device           specify a device to which to connect
 
 optional arguments:
-  -h, --help         show this help message and exit
-  --version          show program's version number and exit
-  -u USER            set the username (defaults to current user
-  -p                 use a password (will prompt; DO NOT enter as arg)
-  -x EXECUTABLE      exec command to connect (default ssh)
-  -c, --config-mode  enter lines in config mode, then go interactive
-  -d DEVICETYPE      set the device type (junos, ios, etc)
-  --list-types       list available device types
-  -i INPUT           set the input file for commands
-  -t TIMEOUT         set the timeout for spawning and sending lines
-  -l DEVICELIST      connect to all devices in specified list file
+  -h, --help       show this help message and exit
+  --version        show program's version number and exit
+  -y               send "yes" for host key check (not recommended)
+  -u USER          set a username
+  -p               use a password (will prompt; DO NOT enter as arg)
+  -c COMMAND       command to connect (default ssh)
+  -x, --exec-mode  enter lines in exec mode, instead of config mode
+  -d DEVICETYPE    set the device type (junos, ios, etc)
+  --list-types     list available device types
+  -i INPUT         set the input file for commands
+  -t TIMEOUT       set the timeout for spawning and sending lines
+  -l DEVICELIST    connect to all devices in specified list file
 
 ==== Device types ====
 junos
