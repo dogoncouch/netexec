@@ -33,7 +33,7 @@ optional arguments:
     netexec --list-types
 
 ## Notes
-This doesn't work yet.
+This only supports Juniper devices so far. Cisco support coming soon.
 
 ## Support
 Bugs, questions, and other issues can be directed to the project's [issues page](https://github.com/dogoncouch/netexec/issues) on GitHub, or emailed to [dpersonsdev@gmail.com](mailto:dpersonsdev@gmail.com).
