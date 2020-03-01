@@ -30,30 +30,30 @@ Options
 
 ::
 
-usage: netexec [-h] [--version] [-y] [-u USER] [-p] [-c COMMAND] [-x]
-               [-d DEVICETYPE] [--list-types] [-i INPUT] [-t TIMEOUT]
-               [-l DEVICELIST]
-               [device]
-
-positional arguments:
-  device           specify a device to which to connect
-
-optional arguments:
-  -h, --help       show this help message and exit
-  --version        show program's version number and exit
-  -y               send "yes" for host key check (not recommended)
-  -u USER          set a username
-  -p               use a password (will prompt; DO NOT enter as arg)
-  -c COMMAND       command to connect (default ssh)
-  -x, --exec-mode  enter lines in exec mode, instead of config mode
-  -d DEVICETYPE    set the device type (junos, ios, etc)
-  --list-types     list available device types
-  -i INPUT         set the input file for commands
-  -t TIMEOUT       set the timeout for spawning and sending lines
-  -l DEVICELIST    connect to all devices in specified list file
-
-==== Device types ====
-junos
+    usage: netexec [-h] [--version] [-y] [-u USER] [-p] [-c COMMAND] [-x]
+                   [-d DEVICETYPE] [--list-types] [-i INPUT] [-t TIMEOUT]
+                   [-l DEVICELIST]
+                   [device]
+    
+    positional arguments:
+      device           specify a device to which to connect
+    
+    optional arguments:
+      -h, --help       show this help message and exit
+      --version        show program's version number and exit
+      -y               send "yes" for host key check (not recommended)
+      -u USER          set a username
+      -p               use a password (will prompt; DO NOT enter as arg)
+      -c COMMAND       command to connect (default ssh)
+      -x, --exec-mode  enter lines in exec mode, instead of config mode
+      -d DEVICETYPE    set the device type (junos, ios, etc)
+      --list-types     list available device types
+      -i INPUT         set the input file for commands
+      -t TIMEOUT       set the timeout for spawning and sending lines
+      -l DEVICELIST    connect to all devices in specified list file
+    
+    ==== Device types ====
+    junos
 
 """
 
@@ -84,4 +84,4 @@ setup(name = 'netexec', version = str(__version__),
             "Natural Language :: English",
             "Operating System :: POSIX",
             "Programming Language :: Python",
-            "Topic :: System :: Systems Administration")
+            "Topic :: System :: Systems Administration"])
