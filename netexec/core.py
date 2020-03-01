@@ -281,9 +281,11 @@ class NetExecCore:
             px.interact()
         except(pexpect.exceptions.TIMEOUT):
             # Move to next device on timeout
+            print('==== Timeout: Moving on ====')
             return()
         except pexpect.EOF:
             # Move to next device on disconnect
+            print('==== EOF: Disconnected ====')
             return()
 
 
