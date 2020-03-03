@@ -38,7 +38,7 @@ __version__ = '0.1'
 class NetExecCore:
 
     def __init__(self):
-        """Initialize a total waste of CPU time"""
+        """Initialize the program"""
 
         self.args = None
         self.types = {}
@@ -108,6 +108,7 @@ class NetExecCore:
             self.password = getpass('Password: ')
 
         # Set up device type
+        # To do: read device types from JSON formatted modules
         if self.args.devicetype in self.types:
             self.promptrex = self.types[self.args.devicetype]['promptrex']
             self.configpromptrex = \
@@ -158,11 +159,17 @@ class NetExecCore:
             print('No input file specified; going interactive right away.')
 
 
-    def main_event(self):
-        """Connect to each device in the list"""
+    def config_mode(self):
+        """Set up promt, etc for config mode"""
+        pass
 
-        for device in self.devicelist:
-            self.connect(device)
+    def exec_mode(self):
+        """Set up prompt, etc for exec mode"""
+        pass
+
+    def shell_mode(self):
+        """Set up prompt, etc for shell mode"""
+        pass
 
 
     def connect(self, device):
@@ -225,7 +232,10 @@ class NetExecCore:
                         if self.args.user == 'root' and \
                                 line == 'exit':
                             # Exit through root prompt
+                            # This can be removed when new logic is implemented
                             px.expect(r'root\@\S+:RE:.\%')
+                            print(px.before.decode('utf-8'))
+                            print('Exiting')
                             px.sendline('exit')
                         else:
                             px.expect(self.promptrex,
@@ -238,7 +248,11 @@ class NetExecCore:
             
             else:
                 # Enter config mode, and enter lines
-                px.sendline('configure')
+                # To do: take out if/then, use dictionary for config command
+                if self.args.devicetype == 'junos':
+                    px.sendline('configure')
+                elif self.args.devicetype == 'cisco':
+                    px.sendline('conf t')
                 px.expect(self.configpromptrex, timeout=self.args.timeout)
                 print(px.before.decode('utf-8'))
                 px.sendline('rollback 0')
@@ -247,13 +261,15 @@ class NetExecCore:
                 if self.args.input:
                     for line in self.lines:
                         px.sendline(line)
-                        if line == 'commit and-quit':
+                        if line in ['commit and-quit', 'end']:
                             # Special case for exiting config mode
+                            # This can be removedwhen new logic is implemented
+                            # Can expect exec prompt after, already in list
                             px.expect(self.promptrex,
                                     timeout=self.args.timeout)
                             print(px.before.decode('utf-8'))
-                            px.sendline('exit')
                             print('Exiting')
+                            px.sendline('exit')
                             if self.args.user == 'root' and \
                                     self.args.devicetype == 'junos':
                                 # Exit through shell if user is root
@@ -267,9 +283,11 @@ class NetExecCore:
                                     timeout=self.args.timeout)
                             print(px.before.decode('utf-8'))
                             sleep(0.2)
-                    px.sendline('show | compare')
-                    px.expect(self.configpromptrex, timeout=self.args.timeout)
-                    print(px.before.decode('utf-8'))
+                    if self.args.devicetype == 'junos':
+                        px.sendline('show | compare')
+                        px.expect(self.configpromptrex,
+                                timeout=self.args.timeout)
+                        print(px.before.decode('utf-8'))
                 print('==== Interactive mode ====\nPress enter for a prompt.')
                 px.interact()
 
@@ -287,6 +305,13 @@ class NetExecCore:
             # Move to next device on disconnect
             print('==== EOF: Disconnected ====')
             return()
+
+
+    def main_event(self):
+        """Connect to each device in the list"""
+
+        for device in self.devicelist:
+            self.connect(device)
 
 
     def run_script(self):
