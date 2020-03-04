@@ -105,7 +105,7 @@ class NetExecCore:
 
         # If -p option was used, ask the user for a password
         if self.args.password:
-            self.password = getpass('Password: ')
+            self.password = getpass('Password:')
 
         # Set up device type
         # To do: read device types from JSON formatted modules
