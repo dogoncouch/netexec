@@ -32,10 +32,11 @@ class DeviceTypeModule(OurModule):
 
         #self.usernamerex = r'Username:' # regex for username prompt
         #self.passwordrex = r'Password:' # regex for password prompt
-        self.prompts = [
-                r'\n[a-z_]+@[a-zA-Z0-9\.\-_]+>\s?',
-                r'[a-z_]+@[a-zA-Z0-9\.-]+#\s?'
-                ] # list of possible prompts (regex)
+        self.prompts = {
+                'exec': r'\n[a-z_]+@[a-zA-Z0-9\.\-_]+>\s?',
+                'config': r'[a-z_]+@[a-zA-Z0-9\.-]+#\s?',
+                'shell': r'[a-z_]+@\S+:RE:.\%'
+                } # possible prompts (regex)
 
         self.disablepaging = [
                 'set cli screen-length 0',
@@ -47,3 +48,16 @@ class DeviceTypeModule(OurModule):
         self.commitcommand = 'commit and-quit'
         self.configquit = 'quit'
         self.exitcommand = 'exit'
+
+
+        def configure(self):
+            """Enter lines in config mode"""
+            # This method should enter config mode, run preconfig, enter lines,
+            # and run postconfig. If the device type has the ability to
+            # commit changes, they should not be committed.
+
+
+        def execute(self):
+            """Just enter all the lines"""
+            # This method should just enter lines, and accept any of the
+            # available prompts.

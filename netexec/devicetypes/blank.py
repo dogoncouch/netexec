@@ -32,7 +32,7 @@ class DeviceTypeModule(OurModule):
 
         #self.usernamerex = r'Username:' # regex for username prompt
         #self.passwordrex = r'Password:' # regex for password prompt
-        self.prompts = [] # list of possible prompts (regex)
+        self.prompts = {} # possible prompts (regex)
 
         self.disablepaging = [] # commands to disable paging
 
@@ -42,3 +42,16 @@ class DeviceTypeModule(OurModule):
         self.commitcommand = None
         self.configquit = ''
         self.exitcommand = ''
+
+
+        def configure(self):
+            """Enter lines in config mode"""
+            # This method should enter config mode, run preconfig, enter lines,
+            # and run postconfig. If the device type has the ability to
+            # commit changes, they should not be committed.
+
+
+        def execute(self):
+            """Just enter all the lines"""
+            # This method should just enter lines, and accept any of the
+            # available prompts.
