@@ -31,7 +31,11 @@ class DeviceTypeModule:
 
         self.usernamerex = r'Username:' # regex for username prompt
         self.passwordrex = r'Password:' # regex for password prompt
-        self.prompts = {} # possible prompts (regex)
+        self.prompts = {
+                'exec': r'[a-z_]+@[a-zA-Z0-9\.\-_]+(?:>|#)\s?',
+                'config': r'[a-z_]+@[a-zA-Z0-9\.-_]+#\s?',
+                'shell': r'[a-z_]+@[a-zA-Z0-9\.\-_]+(?:>|#)\s?'
+                } # prompts the program can expect to see
 
         self.disablepaging = [] # commands to disable paging
 
@@ -48,9 +52,11 @@ class DeviceTypeModule:
             # This method should enter config mode, run preconfig, enter lines,
             # and run postconfig. If the device type has the ability to
             # commit changes, they should not be committed.
+            pass
 
 
         def execute(self):
             """Just enter all the lines"""
             # This method should just enter lines, and accept any of the
             # available prompts.
+            pass
