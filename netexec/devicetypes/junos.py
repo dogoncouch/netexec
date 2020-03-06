@@ -50,16 +50,18 @@ class DeviceTypeModule(OurModule):
         #self.exitcommand = 'exit'
 
 
-        #def configure(self):
-        #    """Enter lines in config mode"""
-        #    # This method should enter config mode, run preconfig, enter lines,
-        #    # and run postconfig. If the device type has the ability to
-        #    # commit changes, they should not be committed.
-        #    pass
+        # For junos module, expect exec OR shell prompt and conditional
+        # on which comes up
+        def configure(self):
+            """Enter lines in config mode"""
+            # This method should enter config mode, run preconfig, enter lines,
+            # and run postconfig. If the device type has the ability to
+            # commit changes, they should not be committed.
+            pass
 
 
-        #def execute(self):
-        #    """Just enter all the lines"""
-        #    # This method should just enter lines, and accept any of the
-        #    # available prompts.
-        #    pass
+        def execute(self):
+            """Just enter all the lines"""
+            # This method should just enter lines, and accept any of the
+            # available prompts.
+            pass
