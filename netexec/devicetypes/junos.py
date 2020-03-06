@@ -24,12 +24,15 @@ import re
 from netexec.modules.type import DeviceTypeModule as OurModule
 
 class DeviceTypeModule(OurModule):
-    def __init__(self):
+    def __init__(self, user=None, password=None, timeout=45):
         """Initialize a device type module"""
         # Module information for help menus, etc
         self.name = 'junos'
         self.desc = 'juniper networks junos'
 
+        self.user = user
+        self.password = password
+        self.timeout = timeout
         #self.usernamerex = r'Username:' # regex for username prompt
         #self.passwordrex = r'Password:' # regex for password prompt
         self.prompts = {

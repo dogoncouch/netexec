@@ -29,6 +29,9 @@ class DeviceTypeModule:
         self.name = ''
         self.desc = ''
 
+        self.user = user
+        self.password = password
+        self.timeout = timeout
         self.usernamerex = r'Username:' # regex for username prompt
         self.passwordrex = r'Password:' # regex for password prompt
         self.prompts = {
@@ -47,7 +50,7 @@ class DeviceTypeModule:
         self.exitcommand = 'exit'
 
 
-    def configure(self, configcommands=None, timeout=45):
+    def configure(self, commands=None):
         """Enter lines in config mode"""
         # This method should enter config mode, run preconfig, enter lines,
         # and run postconfig. If the device type has the ability to
@@ -58,8 +61,8 @@ class DeviceTypeModule:
                     self.px.sendline(line)
                     self.px.expect(self.prompts['config'], timeout=self.timeout)
                     print(self.px.before.decode('utf-8'))
-            if configcommands:
-                for line in configcommands:
+            if commands:
+                for line in commands:
                     self.px.sendline(line)
                     self.px.expect(self.prompts['config'], timeout=self.timeout)
                     print(self.px.before.decode('utf-8'))
@@ -113,7 +116,7 @@ class DeviceTypeModule:
         return()
 
 
-    def connect(self):
+    def connect(self, sendyes=False):
         """Initiate a connection"""
         # Connect to the device
         try:
@@ -128,7 +131,7 @@ class DeviceTypeModule:
             self.px = pexpect.spawn(commandline, env=myenv,
                         timeout=self.timeout)
             # Send 'yes' to verify host key, if option is enabled
-            if self.args.yes:
+            if sendyes:
                 sleep(5)
                 verifymsg = 'Are you sure you want to continue ' + \
                         'connecting (yes/no)?'
@@ -136,7 +139,7 @@ class DeviceTypeModule:
                     if verifymsg in self.px.before.decode('utf-8'):
                         self.px.sendline('yes')
             
-            if self.args.password:
+            if self.password:
                 self.px.expect(self.passwordrex, timeout=self.timeout)
                 print(self.px.before.decode('utf-8'))
                 self.px.sendline(self.password)

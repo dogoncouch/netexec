@@ -24,7 +24,7 @@ import re
 from netexec.modules.type import DeviceTypeModule as OurModule
 
 class DeviceTypeModule(OurModule):
-    def __init__(self):
+    def __init__(self, user=None, password=None, timeout=45):
         """Initialize a device type module"""
         # Module information for help menus, etc
         self.name = ''
@@ -32,6 +32,9 @@ class DeviceTypeModule(OurModule):
 
         # Uncomment and change these to modify them from the defaults:
 
+        #self.user = user
+        #self.password = password
+        #self.timeout = timeout
         #self.usernamerex = r'Username:' # regex for username prompt
         #self.passwordrex = r'Password:' # regex for password prompt
         #self.prompts = {} # prompts the program can expect to see
@@ -46,16 +49,5 @@ class DeviceTypeModule(OurModule):
         #self.exitcommand = ''
 
 
-        #def configure(self):
-        #    """Enter lines in config mode"""
-        #    # This method should enter config mode, run preconfig, enter lines,
-        #    # and run postconfig. If the device type has the ability to
-        #    # commit changes, they should not be committed.
-        #    pass
-
-
-        #def execute(self):
-        #    """Just enter all the lines"""
-        #    # This method should just enter lines, and accept any of the
-        #    # available prompts.
-        #    pass
+        # You can define custom connect(), configure(), and exec() commands here.
+        # Use the ones in type.py for reference, that is what you inherit by default.
