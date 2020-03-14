@@ -46,11 +46,11 @@ class DeviceTypeModule:
         self.preconfigcommands = None # None or a list containing preconfiguration commands
         self.postconfigcommands = None # None or a list, like above
         self.commitcommand = None
-        self.configquit = ''
-        self.exitcommand = 'exit'
+        self.configquitcommand = None
+        self.exitcommands = ['exit']
 
 
-    def configure(self, commands=None):
+    def configure(self, commands=None, commit=False):
         """Enter lines in config mode"""
         # This method should enter config mode, run preconfig, enter lines,
         # and run postconfig. If the device type has the ability to
@@ -61,16 +61,38 @@ class DeviceTypeModule:
                     self.px.sendline(line)
                     self.px.expect(self.prompts['config'], timeout=self.timeout)
                     print(self.px.before.decode('utf-8'))
+                    sleep(0.8)
             if commands:
                 for line in commands:
                     self.px.sendline(line)
                     self.px.expect(self.prompts['config'], timeout=self.timeout)
                     print(self.px.before.decode('utf-8'))
+                    sleep(0.8)
             if self.postconfigcommands:
                 for line in self.postconfigcommands:
                     self.px.sendline(line)
                     self.px.expect(self.prompts['config'], timeout=self.timeout)
                     print(self.px.before.decode('utf-8'))
+                    sleep(0.8)
+            if commit:
+                # Commit config
+                if self.commitcommand:
+                    self.px.sendline(self.commitcommand)
+                    self.px.expect(self.prompts['config'], timeout=self.timeout)
+                    print(self.px.before.decode('utf-8'))
+                    sleep(0.8)
+                # Exit config mode, if needed
+                if self.configquitcommand:
+                    self.px.sendline(self.configquitcommand)
+                    self.px.expect(self.prompts['config'], timeout=self.timeout)
+                    print(self.px.before.decode('utf-8'))
+                    sleep(0.8)
+                # Disconnect from the device
+                for line in self.exitcommands:
+                    self.px.sendline(line)
+                    self.px.expect(self.prompts['config'], timeout=self.timeout)
+                    print(self.px.before.decode('utf-8'))
+                    sleep(0.8)
 
     except(KeyboardInterrupt):
         # If user hits ctrl-c, go interactive.
@@ -99,6 +121,7 @@ class DeviceTypeModule:
                     self.px.sendline(line)
                     self.px.expect(self.prompts.values(), timeout=self.timeout)
                     print(self.px.before.decode('utf-8'))
+                    sleep(0.8)
 
     except(KeyboardInterrupt):
         # If user hits ctrl-c, go interactive.
@@ -145,6 +168,7 @@ class DeviceTypeModule:
                 self.px.sendline(self.password)
             self.px.expect(self.prompts.values(), timeout=self.timeout)
             print(self.px.before.decode('utf-8'))
+            sleep(0.8)
 
             # Disable screen paging and stuff
             if self.disablepaging:
@@ -152,6 +176,7 @@ class DeviceTypeModule:
                     self.px.sendline(line)
                     self.px.expect(self.prompts.values(), timeout=self.timeout)
                     print(self.px.before.decode('utf-8'))
+                    sleep(0.8)
 
         except(KeyboardInterrupt):
             # If user hits ctrl-c, go interactive.
