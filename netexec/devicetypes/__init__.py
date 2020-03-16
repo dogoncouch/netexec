@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-__all__ = ['junos']
+__all__ = ['junos', 'blank']
 
 import netexec.devicetypes.blank
 import netexec.devicetypes.junos

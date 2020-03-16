@@ -94,21 +94,20 @@ class DeviceTypeModule:
                     print(self.px.before.decode('utf-8'))
                     sleep(0.8)
 
-    except(KeyboardInterrupt):
-        # If user hits ctrl-c, go interactive.
-        print('==== KeyboardInterrupt ====' + \
-                '\n==== Interactive mode ====' + \
-                '\nPress enter for a prompt.')
-        self.px.interact()
-    except(pexpect.exceptions.TIMEOUT):
-        # Move to next device on timeout
-        print('==== Timeout: Moving on ====')
-        return()
-    except(pexpect.EOF):
-        # Move to next device on disconnect
-        print('==== EOF: Disconnected ====')
-        return()
-        pass
+        except(KeyboardInterrupt):
+            # If user hits ctrl-c, go interactive.
+            print('==== KeyboardInterrupt ====' + \
+                    '\n==== Interactive mode ====' + \
+                    '\nPress enter for a prompt.')
+            self.px.interact()
+        except(pexpect.exceptions.TIMEOUT):
+            # Move to next device on timeout
+            print('==== Timeout: Moving on ====')
+            return()
+        except(pexpect.EOF):
+            # Move to next device on disconnect
+            print('==== EOF: Disconnected ====')
+            return()
 
 
     def execute(self, commands=None):
@@ -123,20 +122,20 @@ class DeviceTypeModule:
                     print(self.px.before.decode('utf-8'))
                     sleep(0.8)
 
-    except(KeyboardInterrupt):
-        # If user hits ctrl-c, go interactive.
-        print('==== KeyboardInterrupt ====' + \
-                '\n==== Interactive mode ====' + \
-                '\nPress enter for a prompt.')
-        self.px.interact()
-    except(pexpect.exceptions.TIMEOUT):
-        # Move to next device on timeout
-        print('==== Timeout: Moving on ====')
-        return()
-    except(pexpect.EOF):
-        # Move to next device on disconnect
-        print('==== EOF: Disconnected ====')
-        return()
+        except(KeyboardInterrupt):
+            # If user hits ctrl-c, go interactive.
+            print('==== KeyboardInterrupt ====' + \
+                    '\n==== Interactive mode ====' + \
+                    '\nPress enter for a prompt.')
+            self.px.interact()
+        except(pexpect.exceptions.TIMEOUT):
+            # Move to next device on timeout
+            print('==== Timeout: Moving on ====')
+            return()
+        except(pexpect.EOF):
+            # Move to next device on disconnect
+            print('==== EOF: Disconnected ====')
+            return()
 
 
     def connect(self, sendyes=False):

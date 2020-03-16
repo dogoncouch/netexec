@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 import re
-from netexec.modules.type import DeviceTypeModule as OurModule
+from netexec.devicetypes.type import DeviceTypeModule as OurModule
 
 class DeviceTypeModule(OurModule):
     def __init__(self, user=None, password=None, timeout=45):

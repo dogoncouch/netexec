@@ -30,9 +30,6 @@ import pexpect
 import re
 from time import sleep
 from os.path import isfile
-import netexec.devicetypes
-import gettext
-gettext.install('netexec')
 
 
 __version__ = '0.1'
@@ -50,7 +47,6 @@ class NetExecCore:
         self.types['junos']['configpromptrex'] = r'[a-z_]+@[a-zA-Z0-9\.-]+#\s?'
         self.types['junos']['usernamerex'] = r'Username:'
         self.types['junos']['passwordrex'] = r'Password:'
-        self.devicetype_modules = {}
 
 
     def get_args(self):
@@ -101,12 +97,11 @@ class NetExecCore:
         """Set variables"""
 
         # If --list-types option was used, list types and exit
-        #if self.args.list_types:
-        #    self.list_types()
-        #    #print('==== Device types ====')
-        #    #for key in self.types.keys():
-        #    #    print(key)
-        #    #exit(0)
+        if self.args.list_types:
+            print('==== Device types ====')
+            for key in self.types.keys():
+                print(key)
+            exit(0)
 
         # If -p option was used, ask the user for a password
         if self.args.password:
@@ -133,22 +128,6 @@ class NetExecCore:
             self.devicelist.append(self.args.device)
         if self.args.input:
             self.read_input()
-
-
-    def list_devicetypes(self, *args):
-        """Return a list of available parsing modules"""
-        print('==== Available parsing modules: ====\n')
-        for devicetype in sorted(self.devicetype_modules):
-            print(self.devicetype_modules[devicetype].name.ljust(16) + \
-                ': ' + self.devicetype_modules[devicetype].desc)
-        exit(0)
-    
-    def load_devicetypes(self):
-        """Load parsing module(s)"""
-        for devicetype in sorted(netexec.devicetypes.__all__):
-            self.devicetype_modules[devicetype] = \
-                __import__('netexec.devicetypes.' + devicetype, globals(), \
-                locals(), [netexec]).DeviceTypeModule()
 
 
     def read_devices(self):
@@ -341,9 +320,6 @@ class NetExecCore:
         try:
             self.get_args()
             self.setup()
-            self.load_devicetypes()
-            if self.args.list_types:
-                self.list_devicetypes()
             self.main_event()
 
         except KeyboardInterrupt:
