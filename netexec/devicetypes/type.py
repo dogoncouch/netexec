@@ -20,10 +20,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+from os import environ
+from sys import exit
+from time import sleep
+import pexpect
 import re
 
 class DeviceTypeModule:
-    def __init__(self, user=None, password=None, timeout=45):
+    def __init__(self):
         """Initialize a device type module"""
         # Module information for help menus, etc
         self.name = ''
@@ -34,11 +38,13 @@ class DeviceTypeModule:
         self.timeout = timeout
         self.usernamerex = r'Username:' # regex for username prompt
         self.passwordrex = r'Password:' # regex for password prompt
+
         self.prompts = {
-                'exec': r'[a-z_]+@[a-zA-Z0-9\.\-_]+(?:>|#)\s?',
-                'config': r'[a-z_]+@[a-zA-Z0-9\.-_]+#\s?',
-                'shell': r'[a-z_]+@[a-zA-Z0-9\.\-_]+(?:>|#)\s?'
+                'exec': r'[a-z\-\._]+@[a-zA-Z0-9\.\-_]+(?:>|#)\s?',
+                'config': r'[a-z\-\._]+@[a-zA-Z0-9\.\-_]+#\s?',
+                'shell': r'[a-z\-\._]+@[a-zA-Z0-9\.\-_]+(?:>|#)\s?'
                 } # prompts the program can expect to see
+        self.promptoptions = list(self.prompts.values())
 
         self.disablepaging = [] # commands to disable paging
 
@@ -56,6 +62,11 @@ class DeviceTypeModule:
         # and run postconfig. If the device type has the ability to
         # commit changes, they should not be committed.
         try:
+            if self.configcommand:
+                self.px.sendline(self.configcommand)
+                self.px.expect(self.prompts['config'], timeout=self.timeout)
+                print(self.px.before.decode('utf-8'))
+                sleep(0.8)
             if self.preconfigcommands:
                 for line in self.preconfigcommands:
                     self.px.sendline(line)
@@ -118,7 +129,7 @@ class DeviceTypeModule:
             if commands:
                 for line in commands:
                     self.px.sendline(line)
-                    self.px.expect(self.prompts.values(), timeout=self.timeout)
+                    self.px.expect(self.promptoptions, timeout=self.timeout)
                     print(self.px.before.decode('utf-8'))
                     sleep(0.8)
 
@@ -138,17 +149,18 @@ class DeviceTypeModule:
             return()
 
 
-    def connect(self, sendyes=False):
+    def connect(self, device=None, user=None, password=None, timeout=45,
+            command=None, sendyes=False):
         """Initiate a connection"""
         # Connect to the device
         try:
             myenv = environ.copy()
             if self.user:
                 # Set up connection command
-                commandline = 'bash -ic "' + self.args.command + ' ' + \
+                commandline = 'bash -ic "' + command + ' ' + \
                         self.args.user + '@' + device + '"'
             else:
-                commandline = 'bash -ic "' + self.args.command + ' ' + \
+                commandline = 'bash -ic "' + command + ' ' + \
                         device + '"'
             self.px = pexpect.spawn(commandline, env=myenv,
                         timeout=self.timeout)
@@ -165,7 +177,7 @@ class DeviceTypeModule:
                 self.px.expect(self.passwordrex, timeout=self.timeout)
                 print(self.px.before.decode('utf-8'))
                 self.px.sendline(self.password)
-            self.px.expect(self.prompts.values(), timeout=self.timeout)
+            self.px.expect(self.promptoptions, timeout=self.timeout)
             print(self.px.before.decode('utf-8'))
             sleep(0.8)
 
@@ -173,7 +185,7 @@ class DeviceTypeModule:
             if self.disablepaging:
                 for line in self.disablepaging:
                     self.px.sendline(line)
-                    self.px.expect(self.prompts.values(), timeout=self.timeout)
+                    self.px.expect(self.promptoptions, timeout=self.timeout)
                     print(self.px.before.decode('utf-8'))
                     sleep(0.8)
 

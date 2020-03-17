@@ -33,39 +33,39 @@ class DeviceTypeModule(OurModule):
         self.user = user
         self.password = password
         self.timeout = timeout
-        #self.usernamerex = r'Username:' # regex for username prompt
-        #self.passwordrex = r'Password:' # regex for password prompt
+        self.usernamerex = r'Username:' # regex for username prompt
+        self.passwordrex = r'Password:' # regex for password prompt
+
         self.prompts = {
-                'exec': r'[a-zA-Z0-9\.-_]+@[a-zA-Z0-9\.\-_]+>\s?',
-                'config': r'[a-zA-Z0-9\.-_]+@[a-zA-Z0-9\.-_]+#\s?',
-                'shell': r'[a-zA-Z0-9\.-_]+@\S+:RE:.\%'
+                'exec': r'[a-zA-Z0-9\.\-_]+@[a-zA-Z0-9\.\-_]+>\s?',
+                'config': r'[a-zA-Z0-9\.\-_]+@[a-zA-Z0-9\.\-_]+#\s?',
+                'shell': r'[a-zA-Z0-9\.\-_]+@\S+:RE:.\%'
                 } # prompts the program can expect to see
+        self.promptoptions = list(self.prompts.values())
 
         self.disablepaging = [
                 'set cli screen-length 0',
                 'set cli screen-width 1000'
                 ] # commands to disable paging
         self.configcommand = 'configure'
-        self.preconfigcommand = 'rollback 0'
-        self.postconfigcommand = 'show | compare'
+        self.preconfigcommands = ['rollback 0']
+        self.postconfigcommands = ['show | compare']
         self.commitcommand = 'commit and-quit'
-        # configquit isn't needed, since commit and-quit quits config mode
-        #self.configquit = 'quit'
-        #self.exitcommand = 'exit'
+        # configquit isn't needed, since 'commit and-quit' quits config mode
+        self.configquit = None
+        self.exitcommand = 'exit'
 
 
-        # For junos module, expect exec OR shell prompt and conditional
-        # on which comes up
-        #def configure(self):
-        #    """Enter lines in config mode"""
-        #    # This method should enter config mode, run preconfig, enter lines,
-        #    # and run postconfig. If the device type has the ability to
-        #    # commit changes, they should not be committed.
-        #    pass
+    #def configure(self):
+    #    """Enter lines in config mode"""
+    #    # This method should enter config mode, run preconfig, enter lines,
+    #    # and run postconfig. If the device type has the ability to
+    #    # commit changes, they should not be committed.
+    #    pass
 
 
-        #def execute(self):
-        #    """Just enter all the lines"""
-        #    # This method should just enter lines, and accept any of the
-        #    # available prompts.
-        #    pass
+    #def execute(self):
+    #    """Just enter all the lines"""
+    #    # This method should just enter lines, and accept any of the
+    #    # available prompts.
+    #    pass

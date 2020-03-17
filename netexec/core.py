@@ -42,20 +42,12 @@ class NetExecCore:
 
     def __init__(self):
         """Initialize the program"""
-
         self.args = None
-        self.types = {}
-        self.types['junos'] = {}
-        self.types['junos']['promptrex'] = r'\n[a-z_]+@[a-zA-Z0-9\.\-_]+>\s?'
-        self.types['junos']['configpromptrex'] = r'[a-z_]+@[a-zA-Z0-9\.-]+#\s?'
-        self.types['junos']['usernamerex'] = r'Username:'
-        self.types['junos']['passwordrex'] = r'Password:'
-        self.devicetype_modules = {}
+        self.devicetypes = {}
 
 
     def get_args(self):
         """Set argument options"""
-
         parser = ArgumentParser()
         parser.add_argument('--version', action = 'version',
                 version = '%(prog)s ' + str(__version__))
@@ -71,9 +63,13 @@ class NetExecCore:
         parser.add_argument('-c',
                 action = 'store', dest = 'command', default = 'ssh',
                 help = 'command to connect (default ssh)')
-        parser.add_argument('-x', '--exec-mode',
+        modeparser = parser.add_mutually_exclusive_group()
+        modeparser.add_argument('-x', '--exec-mode',
                 action = 'store_true', dest = 'execmode',
                 help = 'enter lines in exec mode, instead of config mode')
+        modeparser.add_argument('--commit',
+                action = 'store_true',
+                help = 'commit config and exit (no interactive mode')
         parser.add_argument('-d',
                 action = 'store', dest = 'devicetype', default = 'junos',
                 help = 'set the device type (junos, ios, etc)')
@@ -99,36 +95,16 @@ class NetExecCore:
 
     def setup(self):
         """Set variables"""
-
-        # If --list-types option was used, list types and exit
-        #if self.args.list_types:
-        #    self.list_types()
-        #    #print('==== Device types ====')
-        #    #for key in self.types.keys():
-        #    #    print(key)
-        #    #exit(0)
-
         # If -p option was used, ask the user for a password
         if self.args.password:
             self.password = getpass('Password:')
-
-        # Set up device type
-        # To do: read device types from JSON formatted modules
-        if self.args.devicetype in self.types:
-            self.promptrex = self.types[self.args.devicetype]['promptrex']
-            self.configpromptrex = \
-                    self.types[self.args.devicetype]['configpromptrex']
-            self.usernamerex = self.types[self.args.devicetype]['usernamerex']
-            self.passwordrex = self.types[self.args.devicetype]['passwordrex']
         else:
-            print('Device type ' + self.args.devicetype + \
-                    ' not recognized.\nTry --list-types option.')
+            self.password = None
 
         # Set up device list
         self.devicelist = []
         if self.args.devicelist:
             self.read_devices()
-            pass
         else:
             self.devicelist.append(self.args.device)
         if self.args.input:
@@ -138,22 +114,21 @@ class NetExecCore:
     def list_devicetypes(self, *args):
         """Return a list of available parsing modules"""
         print('==== Available parsing modules: ====\n')
-        for devicetype in sorted(self.devicetype_modules):
-            print(self.devicetype_modules[devicetype].name.ljust(16) + \
-                ': ' + self.devicetype_modules[devicetype].desc)
+        for devicetype in sorted(self.devicetypes):
+            print(self.devicetypes[devicetype].name.ljust(16) + \
+                ': ' + self.devicetypes[devicetype].desc)
         exit(0)
     
     def load_devicetypes(self):
         """Load parsing module(s)"""
         for devicetype in sorted(netexec.devicetypes.__all__):
-            self.devicetype_modules[devicetype] = \
+            self.devicetypes[devicetype] = \
                 __import__('netexec.devicetypes.' + devicetype, globals(), \
                 locals(), [netexec]).DeviceTypeModule()
 
 
     def read_devices(self):
         """Read lines from device list file"""
-
         if self.args.devicelist:
             if isfile(self.args.devicelist):
                 with open(self.args.devicelist, 'r') as f:
@@ -168,7 +143,6 @@ class NetExecCore:
 
     def read_input(self):
         """Read lines from input file to execute on devices"""
-
         if self.args.input:
             if isfile(self.args.input):
                 with open(self.args.input, 'r') as f:
@@ -177,174 +151,31 @@ class NetExecCore:
                 print('Input command file not found: ' + self.args.input + '.')
                 exit(1)
         else:
-            print('No input file specified; going interactive right away.')
+            print('No input file specified; will go interactive right away.')
 
 
-    def config_mode(self):
-        """Set up promt, etc for config mode"""
-        pass
-
-    def exec_mode(self):
-        """Set up prompt, etc for exec mode"""
-        pass
-
-    def shell_mode(self):
-        """Set up prompt, etc for shell mode"""
-        pass
-
-
-    def connect(self, device):
-        """Connect to a device and do stuff"""
-
-        try:
-            # Connect to the device
-            try:
-                myenv = environ.copy()
-                if self.args.user:
-                    # Set up connection command
-                    commandline = 'bash -ic "' + self.args.command + ' ' + \
-                            self.args.user + '@' + device + '"'
-                else:
-                    commandline = 'bash -ic "' + self.args.command + ' ' + \
-                            device + '"'
-                px = pexpect.spawn(commandline, env=myenv,
-                            timeout=self.args.timeout)
-                # Send 'yes' to verify host key, if option is enabled
-                if self.args.yes:
-                    sleep(5)
-                    verifymsg = 'Are you sure you want to continue ' + \
-                            'connecting (yes/no)?'
-                    if px.before:
-                        if verifymsg in px.before.decode('utf-8'):
-                            px.sendline('yes')
-                if self.args.password:
-                    px.expect(self.passwordrex, timeout=self.args.timeout)
-                    px.sendline(self.password)
-            except pexpect.exceptions.TIMEOUT:
-                print('Connection timed out.')
-                return()
-
-            if self.args.devicetype == 'junos' and self.args.user == 'root':
-                # Expect juniper root prompt and enter junos CLI
-                px.expect(r'root\@\S+:RE:.\%')
-                print(px.before.decode('utf-8'))
-                px.sendline('cli')
-
-            # To do: change logic, expect list of things to cover junos root,
-            # verify message, etc.
-            # To Do: use custom function instead of expecting prompt to cover
-            # multiple prompt types
-            px.expect(self.promptrex, timeout=self.args.timeout)
-            print(px.before.decode('utf-8'))
-
-            # Disable screen paging and screen wrap
-            px.sendline('set cli screen-length 0')
-            px.expect(self.promptrex, timeout=self.args.timeout)
-            print(px.before.decode('utf-8'))
-            px.sendline('set cli screen-width 1000')
-            px.expect(self.promptrex, timeout=self.args.timeout)
-            print(px.before.decode('utf-8'))
-            
-            if self.args.execmode:
-                # Enter lines in exec mode
-                if self.args.input:
-                    for line in self.lines:
-                        px.sendline(line)
-                        if self.args.user == 'root' and \
-                                line == 'exit':
-                            # Exit through root prompt
-                            # This can be removed when new logic is implemented
-                            px.expect(r'root\@\S+:RE:.\%')
-                            print(px.before.decode('utf-8'))
-                            print('Exiting')
-                            px.sendline('exit')
-                        else:
-                            px.expect(self.promptrex,
-                                    timeout=self.args.timeout)
-                            print(px.before.decode('utf-8'))
-                            sleep(0.2)
-
-                print('==== Interactive mode ====\nPress enter for a prompt.')
-                px.interact()
-            
-            else:
-                # Enter config mode, and enter lines
-                # To do: take out if/then, use dictionary for config command
-                if self.args.devicetype == 'junos':
-                    px.sendline('configure')
-                elif self.args.devicetype == 'cisco':
-                    px.sendline('conf t')
-                px.expect(self.configpromptrex, timeout=self.args.timeout)
-                print(px.before.decode('utf-8'))
-                px.sendline('rollback 0')
-                px.expect(self.configpromptrex, timeout=self.args.timeout)
-                print(px.before.decode('utf-8'))
-                if self.args.input:
-                    for line in self.lines:
-                        px.sendline(line)
-                        if line in ['commit and-quit', 'end']:
-                            # Special case for exiting config mode
-                            # This can be removedwhen new logic is implemented
-                            # Can expect exec prompt after, already in list
-                            px.expect(self.promptrex,
-                                    timeout=self.args.timeout)
-                            print(px.before.decode('utf-8'))
-                            print('Exiting')
-                            px.sendline('exit')
-                            if self.args.user == 'root' and \
-                                    self.args.devicetype == 'junos':
-                                # Exit through shell if user is root
-                                px.expect(r'root\@\S+:RE:.\%')
-                                print(px.before.decode('utf-8'))
-                                print('Exiting')
-                                px.sendline('exit')
-                                return()
-                        else:
-                            px.expect(self.configpromptrex,
-                                    timeout=self.args.timeout)
-                            print(px.before.decode('utf-8'))
-                            sleep(0.2)
-                    if self.args.devicetype == 'junos':
-                        px.sendline('show | compare')
-                        px.expect(self.configpromptrex,
-                                timeout=self.args.timeout)
-                        print(px.before.decode('utf-8'))
-                print('==== Interactive mode ====\nPress enter for a prompt.')
-                px.interact()
-
-        except(KeyboardInterrupt):
-            # If user hits ctrl-c, go interactive.
-            print('==== KeyboardInterrupt ====' + \
-                    '\n==== Interactive mode ====' + \
-                    '\nPress enter for a prompt.')
-            px.interact()
-        except(pexpect.exceptions.TIMEOUT):
-            # Move to next device on timeout
-            print('==== Timeout: Moving on ====')
-            return()
-        except pexpect.EOF:
-            # Move to next device on disconnect
-            print('==== EOF: Disconnected ====')
-            return()
-
-
-    def main_event(self):
-        """Connect to each device in the list"""
-
+    def connect_devices(self):
+        """Connect to devices and execute"""
+        con = self.devicetypes[self.args.devicetype]
         for device in self.devicelist:
-            self.connect(device)
+            con.connect(device, user=self.args.user, password=self.password,
+                    timeout=self.args.timeout, command=self.args.command)
+            if self.args.execmode:
+                con.execute(commands=self.lines)
+            else:
+                con.configure(commands=self.lines, commit=self.args.commit)
 
 
     def run_script(self):
         """Run the whole program"""
-
         try:
             self.get_args()
             self.setup()
             self.load_devicetypes()
             if self.args.list_types:
                 self.list_devicetypes()
-            self.main_event()
+            else:
+                self.connect_devices()
 
         except KeyboardInterrupt:
             print('\nExiting on KeyboardInterrupt')
