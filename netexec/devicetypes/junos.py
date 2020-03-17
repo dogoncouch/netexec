@@ -47,13 +47,13 @@ class DeviceTypeModule(OurModule):
                 'set cli screen-length 0',
                 'set cli screen-width 1000'
                 ] # commands to disable paging
-        self.configcommand = 'configure'
-        self.preconfigcommands = ['rollback 0']
+        self.configcommand = 'configure private'
+        self.preconfigcommands = None
         self.postconfigcommands = ['show | compare']
         self.commitcommand = 'commit and-quit'
         # configquit isn't needed, since 'commit and-quit' quits config mode
-        self.configquit = None
-        self.exitcommand = 'exit'
+        self.configquitcommand = None
+        self.exitcommands = ['exit']
 
 
     #def configure(self):

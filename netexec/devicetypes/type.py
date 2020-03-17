@@ -89,21 +89,25 @@ class DeviceTypeModule:
                 # Commit config
                 if self.commitcommand:
                     self.px.sendline(self.commitcommand)
-                    self.px.expect(self.prompts['config'], timeout=self.timeout)
+                    self.px.expect(self.promptoptions, timeout=self.timeout)
                     print(self.px.before.decode('utf-8'))
                     sleep(0.8)
                 # Exit config mode, if needed
                 if self.configquitcommand:
                     self.px.sendline(self.configquitcommand)
-                    self.px.expect(self.prompts['config'], timeout=self.timeout)
+                    self.px.expect(self.promptoptions, timeout=self.timeout)
                     print(self.px.before.decode('utf-8'))
                     sleep(0.8)
                 # Disconnect from the device
                 for line in self.exitcommands:
                     self.px.sendline(line)
-                    self.px.expect(self.prompts['config'], timeout=self.timeout)
+                    self.px.expect(self.promptoptions, timeout=self.timeout)
                     print(self.px.before.decode('utf-8'))
                     sleep(0.8)
+            else:
+                print('\n==== Interactive mode ====' + \
+                        '\nPress enter for a prompt.')
+                self.px.interact()
 
         except(KeyboardInterrupt):
             # If user hits ctrl-c, go interactive.
@@ -117,6 +121,10 @@ class DeviceTypeModule:
             return()
         except(pexpect.EOF):
             # Move to next device on disconnect
+            try:
+                print(self.px.before.decode('utf-8'))
+            except(Exception):
+                pass
             print('==== EOF: Disconnected ====')
             return()
 
@@ -132,6 +140,9 @@ class DeviceTypeModule:
                     self.px.expect(self.promptoptions, timeout=self.timeout)
                     print(self.px.before.decode('utf-8'))
                     sleep(0.8)
+            print('\n==== Interactive mode ====' + \
+                    '\nPress enter for a prompt.')
+            self.px.interact()
 
         except(KeyboardInterrupt):
             # If user hits ctrl-c, go interactive.
@@ -150,7 +161,7 @@ class DeviceTypeModule:
 
 
     def connect(self, device=None, user=None, password=None, timeout=45,
-            command=None, sendyes=False):
+            command='ssh', sendyes=False):
         """Initiate a connection"""
         # Connect to the device
         try:
