@@ -30,10 +30,10 @@ Options
 
 ::
 
-    usage: netexec [-h] [--version] [-y] [-u USER] [-p] [-c COMMAND] [-x]
-                   [-d DEVICETYPE] [--list-types] [-i INPUT] [-t TIMEOUT]
-                   [-l DEVICELIST]
-                   [device]
+    usage: netexec [-h] [--version] [-y] [-u USER] [-p] [-c COMMAND]
+               [-x | --commit] [-d DEVICETYPE] [--list-types] [-i INPUT]
+               [-t TIMEOUT] [-l DEVICELIST]
+               [device]
     
     positional arguments:
       device           specify a device to which to connect
@@ -46,14 +46,17 @@ Options
       -p               use a password (will prompt; DO NOT enter as arg)
       -c COMMAND       command to connect (default ssh)
       -x, --exec-mode  enter lines in exec mode, instead of config mode
+      --commit         commit config and exit (no interactive mode
       -d DEVICETYPE    set the device type (junos, ios, etc)
       --list-types     list available device types
       -i INPUT         set the input file for commands
       -t TIMEOUT       set the timeout for spawning and sending lines
       -l DEVICELIST    connect to all devices in specified list file
     
-    ==== Device types ====
-    junos
+    ==== Available parsing modules: ====
+    
+    blank           : a blank devicetype module
+    junos           : juniper networks junos
 
 """
 
@@ -73,7 +76,7 @@ setup(name = 'netexec', version = str(__version__),
         url = 'https://github.com/dogoncouch/netexec',
         download_url = 'https://github.com/dogoncouch/netexec/archive/v' + str(__version__) + '.tar.gz',
         keywords = ['network-automation', 'networking', 'automation'],
-        packages = ['netexec'],
+        packages = ['netexec', 'netexec.devicetypes'],
         entry_points = \
                 { 'console_scripts': [ 'netexec = netexec.core:main' ]},
         data_files = ourdata,
