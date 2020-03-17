@@ -112,15 +112,15 @@ class NetExecCore:
 
 
     def list_devicetypes(self, *args):
-        """Return a list of available parsing modules"""
-        print('==== Available parsing modules: ====\n')
+        """Return a list of available device type modules"""
+        print('==== Available device type modules: ====\n')
         for devicetype in sorted(self.devicetypes):
             print(self.devicetypes[devicetype].name.ljust(16) + \
                 ': ' + self.devicetypes[devicetype].desc)
         exit(0)
     
     def load_devicetypes(self):
-        """Load parsing module(s)"""
+        """Load device type module(s)"""
         for devicetype in sorted(netexec.devicetypes.__all__):
             self.devicetypes[devicetype] = \
                 __import__('netexec.devicetypes.' + devicetype, globals(), \

@@ -27,9 +27,17 @@ optional arguments:
   -l DEVICELIST    connect to all devices in specified list file
 ```
 
+```
+==== Available device type modules: ====
+
+blank           : a blank devicetype module
+junos           : juniper networks junos
+```
+
 ## Examples
     
-    netexec -u root -p -i inputcommands.txt 10.50.50.1
+    netexec -u testuser -p -i inputcommands.txt 10.50.50.1
+    netexec -i config.txt -l devicelist.txt -t junos
     netexec --list-types
 
 ## Notes
